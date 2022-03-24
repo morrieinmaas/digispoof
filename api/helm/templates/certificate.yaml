@@ -1,0 +1,30 @@
+{{ if false }}
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+    name: {{ .Values.config.name }}-{{ .Values.config.env }}-cert
+    labels:
+        app.kubernetes.io/name: {{ .Values.config.name }}
+        app.kubernetes.io/part-of: {{ .Values.config.name }}
+        helm.sh/chart: {{ include "chart" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  secretName: {{ template "fullname" . }}
+  duration: 24h
+  renewBefore: 12h
+  dnsNames:
+#  {{- if eq .Values.config.env "prod" }}
+#  - {{ .Values.config.name }}.{{ .Values.config.domain }}    
+#  {{- else }}      
+#  - {{ .Values.config.name }}.{{ .Values.config.env }}.{{ .Values.config.domain }}    
+#  {{- end }}
+  {{- if eq $.Values.config.env "prod" }}
+    - {{ $.Values.config.subdomain }}.{{ $.Values.config.domain }}
+  {{- else }}      
+  - {{ $.Values.config.subdomain }}.{{ $.Values.config.env }}.{{ $.Values.config.domain }}    
+  {{- end }}
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+{{ end }}
