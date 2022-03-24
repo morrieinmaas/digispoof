@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "fullname" . }}
+  #namespace: {{ .Values.config.env }}
+  labels:
+    app.kubernetes.io/name: {{ .Values.config.name }}
+    app.kubernetes.io/part-of: {{ .Values.config.name }}
+    helm.sh/chart: {{ include "chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  project_name: {{ .Values.config.projectName | quote }}
+  app-name: {{ .Values.config.name | quote }}
+  app-version: {{ .Values.config.version | quote }}
+  {{ if .Values.config.id }}
+  app-id: {{ .Values.config.id | quote }}
+  {{ end }}
+  app-domain: {{ .Values.config.domain | quote }} 
+  app-web: {{ .Values.config.web | quote }}
+  app-subpath-routing: {{ .Values.config.subpathRouting | quote }}
+  app-subpath: {{ .Values.config.subpath | quote }}
+  
+  app-auth: {{ .Values.config.authorisationEnabled | quote }}
+  app-audittrail: {{ .Values.config.audittrailEnabled | quote }}
+  app-notification: {{ .Values.config.notificationEnabled | quote }}
+  
+  cache: {{ .Values.config.cache | quote }}
+  env: {{ .Values.config.env | quote }}
+  debug: {{ .Values.config.debug | quote }}
+  trusted-proxies: {{ join "," .Values.config.trustedProxies }}
+  trusted-hosts: {{ .Values.config.trustedHosts | quote }}
+  php-service: {{ .Values.config.name }}-{{ .Values.config.env }}-php  
+
+  digispoof-location: {{ .Values.commonground.digispoof.location }}
+  eherkenning-location: {{ .Values.commonground.eherkenning.location }}
+
+  {{- if .Values.redis.enabled }}
+  redis-host: {{ printf "%s-redis" $redisServiceName | quote }}
+  redis-port: {{ .Values.redis.redisPort | toString | quote }}
+
+  {{-end }}
